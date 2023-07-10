@@ -20,5 +20,8 @@
     "axios": "^1.4.0",
     "export-to-csv": "^0.2.1",
     "jsdom": "^22.1.0"
+  },
+  "devDependencies": {
+    "jest": "^29.6.1"
   }
 }
