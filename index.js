@@ -58,23 +58,57 @@ async function addMovies(vod) {
     await getData(vod.url).then(res => {
         titles = getTitles(res);
         ratings = getRatings(res);
-        titles.forEach((title, index) => vod.movies.push({title: title, rating: ratings[index]}));
+        // some movies have no rating so I replace it with X
+        titles.forEach((title, index) => vod.movies.push({title: title, rating: ratings[index] || 'X', vod: vod.name}));
     })
 }
 
-    
+function deduplicateMovies(vods) {
+    const allMovies = [];
+    vods.forEach(vod => {
+        vod.movies.forEach(movie => {
+            allMovies.push(movie);
+        })
+    })
+    const uniqueMovies = allMovies.reduce(function(acc, curr) {
+        const x = acc.find(item => item.title === curr.title);
+        if (!x) {
+            return acc.concat([curr]);
+        } else {
+            if (x.rating >= curr.rating) {
+                return acc
+            } else {
+                return acc.filter(item => item.title !== curr.title).concat([curr]);
+            }
+        }
+    }, []);
+    return uniqueMovies;
+}
 
-// getData(netflix.url).then(res => {
-//     addMovies(netflix).then(() => {
-//         addMovies(hbo).then(() => {
-//             addMovies(canal_plus).then(() => {
-//                 addMovies(disney_plus).then(() => {
-//                     console.log(netflix);
-//                     console.log(hbo);
-//                     console.log(canal_plus);
-//                     console.log(disney_plus);
-//                 })
-//             })
-//         })
-//     })
-// })
+function sortMovies(movies) {
+    movies.sort((a, b) => {
+        if (a.rating === 'X') {
+            return 1;
+        } else if (b.rating === 'X') {
+            return -1;
+        }
+        return b.rating - a.rating;
+    })
+
+}
+
+
+getData(netflix.url).then(res => {
+    addMovies(netflix).then(() => {
+        addMovies(hbo).then(() => {
+            addMovies(canal_plus).then(() => {
+                addMovies(disney_plus).then(() => {
+                    const vods = [netflix, hbo, canal_plus, disney_plus];
+                    const uniqueMovies = deduplicateMovies(vods);
+                    sortMovies(uniqueMovies);
+                    console.log(uniqueMovies);
+                })
+            })
+        })
+    })
+})
