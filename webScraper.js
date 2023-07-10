@@ -37,7 +37,7 @@ async function getData(vod_url) {
     console.error(error);
     throw new Error('Failed to fetch data');
   }
-}
+};
 
 function getTitles(document) {
   const dom = new jsdom.JSDOM(document);
@@ -46,7 +46,7 @@ function getTitles(document) {
   const moviesArray = Array.from(moviesTags);
   const moviesTitles = moviesArray.map(movie => movie.textContent).filter(movie => movie !== '');
   return moviesTitles.splice(0, 10);
-}
+};
 
 function getRatings(document) {
   const dom = new jsdom.JSDOM(document);
@@ -55,7 +55,7 @@ function getRatings(document) {
   const ratingsArray = Array.from(ratingsTags);
   const ratings = ratingsArray.map(rating => rating.textContent);
   return ratings.splice(0, 10);
-}
+};
 
 async function addMovies(vod) {
   try {
@@ -67,7 +67,7 @@ async function addMovies(vod) {
     console.error(error);
     throw new Error('Failed to add movies');
   }
-}
+};
 
 function deduplicateMovies(vods) {
   const allMovies = [];
@@ -89,10 +89,10 @@ function deduplicateMovies(vods) {
     }
   }, []);
   return uniqueMovies;
-}
+};
 
 function sortMovies(movies) {
-  movies.sort((a, b) => {
+  const sortedMovies = movies.sort((a, b) => {
     if (a.rating > b.rating) {
       return -1;
     }
@@ -101,7 +101,9 @@ function sortMovies(movies) {
     }
     return 0;
   });
+  return sortedMovies;
 }
+
 
 function exportToCsv(movies) {
   try {
@@ -125,7 +127,7 @@ function exportToCsv(movies) {
     console.error(error);
     throw new Error('Failed to export CSV');
   }
-}
+};
 
 async function webScraper() {
   try {
@@ -140,6 +142,16 @@ async function webScraper() {
   } catch (error) {
     console.error(error);
   }
-}
+};
 
 webScraper();
+
+module.exports = {
+  getData,
+  getTitles,
+  getRatings,
+  addMovies,
+  deduplicateMovies,
+  sortMovies,
+  exportToCsv
+};
